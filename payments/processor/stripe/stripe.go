@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/kweheliye/omsv2/common"
 	pb "github.com/kweheliye/omsv2/common/api"
-	"github.com/stripe/stripe-go/v78"
-	"github.com/stripe/stripe-go/v78/checkout/session"
+	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/checkout/session"
 	"log"
 )
 

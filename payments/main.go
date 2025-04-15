@@ -9,7 +9,7 @@ import (
 	"github.com/kweheliye/omsv2/common/discovery/consul"
 	"github.com/kweheliye/omsv2/payments/gateway"
 	stripeProcessor "github.com/kweheliye/omsv2/payments/processor/stripe"
-	"github.com/stripe/stripe-go/v78"
+	"github.com/stripe/stripe-go/v82"
 	"google.golang.org/grpc"
 	"log"
 	"net"

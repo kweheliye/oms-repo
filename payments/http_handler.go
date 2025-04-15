@@ -13,8 +13,8 @@ import (
 	pb "github.com/kweheliye/omsv2/common/api"
 	"github.com/kweheliye/omsv2/common/broker"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/stripe/stripe-go/v78"
-	"github.com/stripe/stripe-go/v78/webhook"
+	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/webhook"
 	"go.opentelemetry.io/otel"
 )
 
@@ -41,7 +41,12 @@ func (h *PaymentHTTPHandler) handleCheckoutWebhook(w http.ResponseWriter, r *htt
 		return
 	}
 
-	event, err := webhook.ConstructEvent(body, r.Header.Get("Stripe-Signature"), endpointStripeSecret)
+	event, err := webhook.ConstructEventWithOptions(
+		body, r.Header.Get("Stripe-Signature"), endpointStripeSecret,
+		webhook.ConstructEventOptions{
+			IgnoreAPIVersionMismatch: true,
+		},
+	)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error verifying webhook signature: %v\n", err)
@@ -95,6 +100,7 @@ func (h *PaymentHTTPHandler) handleCheckoutWebhook(w http.ResponseWriter, r *htt
 			log.Println("Message published order.paid")
 		}
 	}
+	fmt.Println("Webhook received:", string(body))
 
 	w.WriteHeader(http.StatusOK)
 }
