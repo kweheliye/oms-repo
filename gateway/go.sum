@@ -1,0 +1,4 @@
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/kweheliye/omsv2/common v0.0.0-20250408143958-f7dd5cdee9bc h1:6Z1MMbPhU94xMD7oe7uCu6mJyph5o6FykqQVx8Ei6tY=
+github.com/kweheliye/omsv2/common v0.0.0-20250408143958-f7dd5cdee9bc/go.mod h1:5nw62xY93JK8ipraYNQMWO03EZtYjr73KjtbBEtZkis=

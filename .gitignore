@@ -1,0 +1,38 @@
+# Go binary files
+/bin/
+/build/
+/dist/
+*.exe
+*.out
+*.test
+
+# Go modules cache
+/pkg/
+/vendor/
+
+# GoLand specific
+.idea/
+*.iml
+
+# macOS specific files
+.DS_Store
+
+# Environment variable files (for secrets like Stripe keys)
+.env
+.env.*
+
+# Log files
+*.log
+
+# Coverage files
+*.coverprofile
+
+# GoLand/IntelliJ project folders
+.idea/
+.idea_modules/
+.idea/workspace.xml
+.idea/tasks.xml
+
+# GoLand debug files
+*.gdb
+payments/.env
