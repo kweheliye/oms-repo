@@ -19,6 +19,15 @@ func (s *service) GetOrder(ctx context.Context, pb *pb.GetOrderRequest) (*pb.Ord
 	return s.store.Get(ctx, pb.OrderID, pb.CustomerID)
 }
 
+func (s *service) UpdateOrder(ctx context.Context, o *pb.Order) (*pb.Order, error) {
+	err := s.store.Update(ctx, o.ID, o)
+	if err != nil {
+		return nil, err
+	}
+
+	return o, nil
+}
+
 func (s *service) CreateOrder(ctx context.Context, p *pb.CreateOrderRequest, items []*pb.Item) (*pb.Order, error) {
 	id, err := s.store.Create(ctx, p, items)
 	if err != nil {

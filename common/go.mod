@@ -5,6 +5,7 @@ go 1.23.8
 require (
 	github.com/hashicorp/consul/api v1.32.0
 	github.com/rabbitmq/amqp091-go v1.10.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.35.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.35.0

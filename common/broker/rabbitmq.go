@@ -70,6 +70,7 @@ func HandleRetry(ch *amqp.Channel, d *amqp.Delivery) error {
 	}
 
 	time.Sleep(time.Second * time.Duration(retryCount))
+	log.Printf("Handling retry for queue: %s", d.RoutingKey)
 
 	return ch.PublishWithContext(
 		context.Background(),
@@ -87,21 +88,9 @@ func HandleRetry(ch *amqp.Channel, d *amqp.Delivery) error {
 }
 
 func createDLQAndDLX(ch *amqp.Channel) error {
-	q, err := ch.QueueDeclare(
-		"main_queue", // name
-		true,         // durable
-		false,        // delete when unused
-		false,        // exclusive
-		false,        // no-wait
-		nil,          // arguments
-	)
-	if err != nil {
-		return err
-	}
-
 	// Declare DLX
 	dlx := "dlx_main"
-	err = ch.ExchangeDeclare(
+	err := ch.ExchangeDeclare(
 		dlx,      // name
 		"fanout", // type
 		true,     // durable
@@ -109,18 +98,6 @@ func createDLQAndDLX(ch *amqp.Channel) error {
 		false,    // internal
 		false,    // no-wait
 		nil,      // arguments
-	)
-	if err != nil {
-		return err
-	}
-
-	// Bind main queue to DLX
-	err = ch.QueueBind(
-		q.Name, // queue name
-		"",     // routing key
-		dlx,    // exchange
-		false,
-		nil,
 	)
 	if err != nil {
 		return err
@@ -139,6 +116,14 @@ func createDLQAndDLX(ch *amqp.Channel) error {
 		return err
 	}
 
+	// Bind DLQ to DLX
+	err = ch.QueueBind(
+		DLQ, // queue name
+		"",  // routing key
+		dlx, // exchange
+		false,
+		nil,
+	)
 	return err
 }
 

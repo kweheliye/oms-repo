@@ -23,12 +23,12 @@ func (g *gateway) UpdateOrderAfterPaymentLink(ctx context.Context, orderID, paym
 	}
 	defer conn.Close()
 
-	_ = pb.NewOrderServiceClient(conn)
+	ordersClient := pb.NewOrderServiceClient(conn)
 
-	//_, err = ordersClient.UpdateOrder(ctx, &pb.Order{
-	//	ID:          orderID,
-	//	Status:      "waiting_payment",
-	//	PaymentLink: paymentLink,
-	//})
+	_, err = ordersClient.UpdateOrder(ctx, &pb.Order{
+		ID:          orderID,
+		Status:      "waiting_payment",
+		PaymentLink: paymentLink,
+	})
 	return err
 }

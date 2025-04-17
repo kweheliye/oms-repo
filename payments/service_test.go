@@ -13,8 +13,8 @@ func TestService(t *testing.T) {
 	processor := inmem.NewInmem()
 	registry := inmemRegistry.NewRegistry()
 
-	gateway := gateway.NewGateway(registry)
-	svc := NewService(processor, gateway)
+	newGateway := gateway.NewGateway(registry)
+	svc := NewService(processor, newGateway)
 
 	t.Run("should create a payment link", func(t *testing.T) {
 		link, err := svc.CreatePayment(context.Background(), &pb.Order{})

@@ -27,6 +27,17 @@ var (
 )
 
 func main() {
+
+	//logger, _ := zap.NewProduction()
+	//defer logger.Sync()
+	//
+	//zap.ReplaceGlobals(logger)
+
+	err := common.SetGlobalTracer(context.TODO(), serviceName, jaegerAddr)
+	if err != nil {
+		log.Fatal("failed to set global tracer")
+	}
+
 	registry, err := consul.NewRegistry(consulAddr, serviceName)
 	if err != nil {
 		panic(err)
@@ -66,7 +77,8 @@ func main() {
 	store := NewStore()
 	svc := NewService(store)
 	NewGrpcHandler(grpcServer, svc, ch)
-
+	consumer := NewConsumer(svc)
+	go consumer.Listen(ch)
 	log.Println("starting grpc server", grpcAddr)
 
 	if err := grpcServer.Serve(l); err != nil {

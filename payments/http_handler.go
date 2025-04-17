@@ -73,9 +73,10 @@ func (h *PaymentHTTPHandler) handleCheckoutWebhook(w http.ResponseWriter, r *htt
 			defer cancel()
 
 			o := &pb.Order{
-				ID:         orderID,
-				CustomerID: customerID,
-				Status:     "paid",
+				ID:          orderID,
+				CustomerID:  customerID,
+				Status:      "paid",
+				PaymentLink: "",
 			}
 
 			marshalledOrder, err := json.Marshal(o)
@@ -97,7 +98,7 @@ func (h *PaymentHTTPHandler) handleCheckoutWebhook(w http.ResponseWriter, r *htt
 				Headers:      headers,
 			})
 
-			log.Println("Message published order.paid")
+			log.Println("Message published order.paid", o.Status)
 		}
 	}
 	fmt.Println("Webhook received:", string(body))

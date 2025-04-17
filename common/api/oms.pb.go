@@ -27,6 +27,7 @@ type Order struct {
 	CustomerID    string                 `protobuf:"bytes,2,opt,name=customerID,proto3" json:"customerID,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=Status,proto3" json:"Status,omitempty"`
 	Items         []*Item                `protobuf:"bytes,4,rep,name=Items,proto3" json:"Items,omitempty"`
+	PaymentLink   string                 `protobuf:"bytes,5,opt,name=PaymentLink,proto3" json:"PaymentLink,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -87,6 +88,13 @@ func (x *Order) GetItems() []*Item {
 		return x.Items
 	}
 	return nil
+}
+
+func (x *Order) GetPaymentLink() string {
+	if x != nil {
+		return x.PaymentLink
+	}
+	return ""
 }
 
 type GetOrderRequest struct {
@@ -317,14 +325,15 @@ var File_api_oms_proto protoreflect.FileDescriptor
 
 const file_api_oms_proto_rawDesc = "" +
 	"\n" +
-	"\rapi/oms.proto\x12\x03api\"p\n" +
+	"\rapi/oms.proto\x12\x03api\"\x92\x01\n" +
 	"\x05Order\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1e\n" +
 	"\n" +
 	"customerID\x18\x02 \x01(\tR\n" +
 	"customerID\x12\x16\n" +
 	"\x06Status\x18\x03 \x01(\tR\x06Status\x12\x1f\n" +
-	"\x05Items\x18\x04 \x03(\v2\t.api.ItemR\x05Items\"K\n" +
+	"\x05Items\x18\x04 \x03(\v2\t.api.ItemR\x05Items\x12 \n" +
+	"\vPaymentLink\x18\x05 \x01(\tR\vPaymentLink\"K\n" +
 	"\x0fGetOrderRequest\x12\x18\n" +
 	"\aOrderID\x18\x01 \x01(\tR\aOrderID\x12\x1e\n" +
 	"\n" +
@@ -342,11 +351,14 @@ const file_api_oms_proto_rawDesc = "" +
 	"\n" +
 	"customerID\x18\x01 \x01(\tR\n" +
 	"customerID\x12+\n" +
-	"\x05Items\x18\x02 \x03(\v2\x15.api.ItemWithQuantityR\x05Items2p\n" +
+	"\x05Items\x18\x02 \x03(\v2\x15.api.ItemWithQuantityR\x05Items2\x97\x01\n" +
 	"\fOrderService\x122\n" +
 	"\vCreateOrder\x12\x17.api.CreateOrderRequest\x1a\n" +
 	".api.Order\x12,\n" +
 	"\bGetOrder\x12\x14.api.GetOrderRequest\x1a\n" +
+	".api.Order\x12%\n" +
+	"\vUpdateOrder\x12\n" +
+	".api.Order\x1a\n" +
 	".api.OrderB#Z!github.com/kweheliye/omsv2/commonb\x06proto3"
 
 var (
@@ -374,10 +386,12 @@ var file_api_oms_proto_depIdxs = []int32{
 	3, // 1: api.CreateOrderRequest.Items:type_name -> api.ItemWithQuantity
 	4, // 2: api.OrderService.CreateOrder:input_type -> api.CreateOrderRequest
 	1, // 3: api.OrderService.GetOrder:input_type -> api.GetOrderRequest
-	0, // 4: api.OrderService.CreateOrder:output_type -> api.Order
-	0, // 5: api.OrderService.GetOrder:output_type -> api.Order
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
+	0, // 4: api.OrderService.UpdateOrder:input_type -> api.Order
+	0, // 5: api.OrderService.CreateOrder:output_type -> api.Order
+	0, // 6: api.OrderService.GetOrder:output_type -> api.Order
+	0, // 7: api.OrderService.UpdateOrder:output_type -> api.Order
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
