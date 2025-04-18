@@ -6,6 +6,7 @@ import (
 	"github.com/kweheliye/omsv2/common/broker"
 	"github.com/kweheliye/omsv2/common/discovery"
 	"github.com/kweheliye/omsv2/common/discovery/consul"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -27,11 +28,10 @@ var (
 )
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
 
-	//logger, _ := zap.NewProduction()
-	//defer logger.Sync()
-	//
-	//zap.ReplaceGlobals(logger)
+	zap.ReplaceGlobals(logger)
 
 	err := common.SetGlobalTracer(context.TODO(), serviceName, jaegerAddr)
 	if err != nil {
@@ -76,8 +76,12 @@ func main() {
 
 	store := NewStore()
 	svc := NewService(store)
-	NewGrpcHandler(grpcServer, svc, ch)
-	consumer := NewConsumer(svc)
+	svcWithTelemetry := NewTelemetryMiddleware(svc)
+	svcWithLogging := NewLoggingMiddleware(svcWithTelemetry)
+
+	NewGrpcHandler(grpcServer, svcWithLogging, ch)
+
+	consumer := NewConsumer(svcWithLogging)
 	go consumer.Listen(ch)
 	log.Println("starting grpc server", grpcAddr)
 
