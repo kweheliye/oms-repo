@@ -4,15 +4,19 @@ import (
 	"context"
 	"github.com/kweheliye/omsv2/common"
 	pb "github.com/kweheliye/omsv2/common/api"
+	"github.com/kweheliye/omsv2/orders/gateway"
 	"log"
 )
 
 type service struct {
-	store OrdersStore
+	store   OrdersStore
+	gateway gateway.StockGateway
 }
 
-func NewService(store OrdersStore) *service {
-	return &service{store: store}
+func NewService(store OrdersStore, stockGateway gateway.StockGateway) *service {
+	return &service{store: store,
+		gateway: stockGateway,
+	}
 }
 
 func (s *service) GetOrder(ctx context.Context, pb *pb.GetOrderRequest) (*pb.Order, error) {
@@ -51,21 +55,20 @@ func (s *service) ValidateOrder(ctx context.Context, p *pb.CreateOrderRequest) (
 	mergedItems := mergeItemsQuantities(p.Items)
 	log.Println("merging items", mergedItems)
 
-	//Tempoarrry :
-
-	var itemsWithPrice []*pb.Item
-	for _, i := range mergedItems {
-		itemsWithPrice = append(itemsWithPrice, &pb.Item{
-			PriceID:  "price_1RDmQE4WTCZyoKdfjcuMQUvz",
-			Quantity: i.Quantity,
-			ID:       i.ID,
-		})
+	// validate with the stock service
+	inStock, items, err := s.gateway.CheckIfItemIsInStock(ctx, p.CustomerID, mergedItems)
+	if err != nil {
+		return nil, err
 	}
-	return itemsWithPrice, nil
+	if !inStock {
+		return items, common.ErrNoStock
+	}
+
+	return items, nil
 }
 
-func mergeItemsQuantities(items []*pb.ItemWithQuantity) []*pb.ItemWithQuantity {
-	merged := make([]*pb.ItemWithQuantity, 0)
+func mergeItemsQuantities(items []*pb.ItemsWithQuantity) []*pb.ItemsWithQuantity {
+	merged := make([]*pb.ItemsWithQuantity, 0)
 
 	for _, item := range items {
 		found := false

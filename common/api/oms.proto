@@ -32,11 +32,34 @@ message  Item {
   string PriceID =4;
 }
 
-message  ItemWithQuantity {
-  string ID =1;
-  int32 Quantity =2;
+message ItemsWithQuantity {
+  string ID = 1;
+  int32 Quantity = 2;
 }
+
 message  CreateOrderRequest {
   string customerID = 1;
-  repeated  ItemWithQuantity Items =2;
+  repeated  ItemsWithQuantity Items =2;
+}
+
+service StockService {
+  rpc CheckIfItemIsInStock(CheckIfItemIsInStockRequest) returns (CheckIfItemIsInStockResponse);
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse);
+}
+
+message CheckIfItemIsInStockRequest {
+  repeated ItemsWithQuantity Items = 1;
+}
+
+message CheckIfItemIsInStockResponse {
+  bool InStock = 1;
+  repeated Item Items = 2;
+}
+
+message GetItemsRequest {
+  repeated string ItemIDs = 1;
+}
+
+message GetItemsResponse {
+  repeated Item Items = 1;
 }

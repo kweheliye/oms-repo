@@ -6,6 +6,7 @@ import (
 	"github.com/kweheliye/omsv2/common/broker"
 	"github.com/kweheliye/omsv2/common/discovery"
 	"github.com/kweheliye/omsv2/common/discovery/consul"
+	"github.com/kweheliye/omsv2/orders/gateway"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"log"
@@ -73,9 +74,10 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 	defer l.Close()
+	stockGateway := gateway.NewStockGateway(registry)
 
 	store := NewStore()
-	svc := NewService(store)
+	svc := NewService(store, stockGateway)
 	svcWithTelemetry := NewTelemetryMiddleware(svc)
 	svcWithLogging := NewLoggingMiddleware(svcWithTelemetry)
 

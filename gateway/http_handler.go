@@ -57,7 +57,7 @@ func (h *handler) handleGetOrder(w http.ResponseWriter, r *http.Request) {
 func (h *handler) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	customerID := r.PathValue("customerID")
 
-	var items []*pb.ItemWithQuantity
+	var items []*pb.ItemsWithQuantity
 	if err := common.ReadJSON(r, &items); err != nil {
 		common.WriteError(w, http.StatusBadRequest, err.Error())
 		return
@@ -94,7 +94,7 @@ func (h *handler) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	common.WriteJson(w, http.StatusOK, res)
 }
 
-func validateItems(items []*pb.ItemWithQuantity) error {
+func validateItems(items []*pb.ItemsWithQuantity) error {
 	if len(items) == 0 {
 		return common.ErrNoItems
 	}
