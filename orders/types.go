@@ -14,8 +14,8 @@ type OrdersService interface {
 }
 
 type OrdersStore interface {
-	Create(ctx context.Context, p *pb.CreateOrderRequest, pb []*pb.Item) (string, error)
-	Get(ctx context.Context, id, customerID string) (*pb.Order, error)
+	Create(context.Context, Order) (primitive.ObjectID, error)
+	Get(ctx context.Context, id, customerID string) (*Order, error)
 	Update(ctx context.Context, id string, o *pb.Order) error
 }
 

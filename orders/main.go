@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/kweheliye/omsv2/common"
 	"github.com/kweheliye/omsv2/common/broker"
 	"github.com/kweheliye/omsv2/common/discovery"
@@ -24,7 +25,7 @@ var (
 	amqpPort    = common.EnvString("RABBITMQ_PORT", "5672")
 	mongoUser   = common.EnvString("MONGO_DB_USER", "root")
 	mongoPass   = common.EnvString("MONGO_DB_PASS", "example")
-	mongoAddr   = common.EnvString("MONGO_DB_HOST", "localhost:27017")
+	mongoAddr   = common.EnvString("MONGO_DB_HOST", "127.0.0.1:27017")
 	jaegerAddr  = common.EnvString("JAEGER_ADDR", "localhost:4318")
 )
 
@@ -67,6 +68,15 @@ func main() {
 		ch.Close()
 	}()
 
+	// mongo db conn
+	uri := fmt.Sprintf("mongodb://%s", mongoAddr)
+	mongoClient, err := ConnectToMongoDB(uri)
+	if err != nil {
+		logger.Fatal("failed to connect to mongo db", zap.Error(err))
+	}
+
+	fmt.Println(uri)
+
 	grpcServer := grpc.NewServer()
 
 	l, err := net.Listen("tcp", grpcAddr)
@@ -76,7 +86,7 @@ func main() {
 	defer l.Close()
 	stockGateway := gateway.NewStockGateway(registry)
 
-	store := NewStore()
+	store := NewStore(mongoClient)
 	svc := NewService(store, stockGateway)
 	svcWithTelemetry := NewTelemetryMiddleware(svc)
 	svcWithLogging := NewLoggingMiddleware(svcWithTelemetry)
