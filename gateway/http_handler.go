@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	common "github.com/kweheliye/omsv2/common"
+	"github.com/kweheliye/omsv2/common"
 	pb "github.com/kweheliye/omsv2/common/api"
 	"github.com/kweheliye/omsv2/gateway/gateway"
 	"go.opentelemetry.io/otel"
