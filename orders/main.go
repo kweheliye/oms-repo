@@ -69,7 +69,7 @@ func main() {
 	}()
 
 	// mongo db conn
-	uri := fmt.Sprintf("mongodb://%s", mongoAddr)
+	uri := fmt.Sprintf("mongodb://%s:%s@%s", mongoUser, mongoPass, mongoAddr)
 	mongoClient, err := ConnectToMongoDB(uri)
 	if err != nil {
 		logger.Fatal("failed to connect to mongo db", zap.Error(err))
