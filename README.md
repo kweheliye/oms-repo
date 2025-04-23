@@ -1,49 +1,200 @@
 # OMS (Order Management System)
 
-## Local
+A microservices-based order management system for food ordering and delivery, built with Go.
 
-### Docker Compose
+## Overview
 
-For external services like RabbitMQ and JaggerUI, you can use docker compose to start them up.
+OMS is a distributed system that manages the entire lifecycle of food orders, from creation to payment processing, kitchen preparation, and delivery. The system is built using a microservices architecture, with each service responsible for a specific domain of the business.
+
+## Architecture
+
+The system consists of the following microservices:
+
+```
+┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐
+│ Gateway │──────│ Orders  │──────│ Payment │──────│ Kitchen │──────│  Stock  │
+│ Service │      │ Service │      │ Service │      │ Service │      │ Service │
+└─────────┘      └─────────┘      └─────────┘      └─────────┘      └─────────┘
+     │                │                │                │                │
+     │                │                │                │                │
+     └────────────────┴────────────────┴────────────────┴────────────────┘
+                                      │
+                                      │
+                               ┌──────┴───────┐
+                               │   RabbitMQ   │
+                               └──────────────┘
+```
+
+### Communication Patterns
+
+- **Synchronous Communication**: Services communicate with each other using gRPC for direct, synchronous requests.
+- **Asynchronous Communication**: Services publish and subscribe to events using RabbitMQ for asynchronous communication.
+
+### Service Discovery
+
+- **Consul**: Used for service registration, discovery, and health checking.
+
+### Observability
+
+- **Jaeger**: Used for distributed tracing to monitor and troubleshoot transactions across services.
+
+## Components
+
+### Gateway Service
+
+The entry point for client applications. It exposes HTTP endpoints for creating and retrieving orders, and communicates with the Orders service using gRPC.
+
+**Endpoints:**
+- `POST /api/customers/{customerID}/orders` - Create a new order
+- `GET /api/customers/{customerID}/orders/{orderID}` - Get order details
+
+### Orders Service
+
+Manages order creation, validation, and status updates. It communicates with the Stock service to check item availability and with the Payment service to initiate payment processing.
+
+**Responsibilities:**
+- Create and store orders
+- Validate orders with the Stock service
+- Update order status
+- Publish order events to RabbitMQ
+
+### Payments Service
+
+Handles payment processing using Stripe. It creates payment links for orders and processes webhook callbacks from Stripe.
+
+**Responsibilities:**
+- Create payment links for orders
+- Process payment webhooks
+- Update order status after payment
+- Publish payment events to RabbitMQ
+
+### Kitchen Service
+
+Processes paid orders for food preparation. It listens for payment events from RabbitMQ and updates order status when food is ready.
+
+**Responsibilities:**
+- Listen for paid order events
+- Simulate food preparation
+- Update order status to "ready"
+
+### Stock Service
+
+Manages inventory and checks item availability. It provides information about items including prices and quantities.
+
+**Responsibilities:**
+- Check if items are in stock
+- Provide item details including prices
+- Update inventory levels
+
+## Technologies Used
+
+- **Go**: Programming language for all services
+- **gRPC**: For synchronous inter-service communication
+- **RabbitMQ**: For asynchronous messaging between services
+- **MongoDB**: For order data storage
+- **Consul**: For service discovery and registration
+- **Jaeger**: For distributed tracing
+- **Stripe**: For payment processing
+- **Docker**: For containerization and deployment
+
+## Setup and Installation
+
+### Prerequisites
+
+- Go 1.20+
+- Docker and Docker Compose
+- Stripe CLI (for payment testing)
+
+### Running with Docker Compose
+
+For external services like MongoDB, RabbitMQ, Consul, and Jaeger, you can use Docker Compose:
+
 ```bash
-cd ..
 docker compose up --build
 ```
 
-### Start the services
+### Starting the Services
+
+Each service can be started individually using the Go development server or with Air for hot reloading:
 
 ```bash
-cd order && air
-cd payment && air
-...
+# In separate terminals
+cd gateway && air
+cd orders && air
+cd payments && air
+cd kitchen && air
+cd stock && air
 ```
 
-### Start Stripe Server
+### Setting Up Stripe for Payment Testing
 
-Run the following command to start the stripe cli
+1. Login to Stripe CLI:
 ```bash
 stripe login
 ```
 
-Then run the following command to listen for webhooks
-
+2. Listen for webhooks:
 ```bash
- stripe listen --forward-to localhost:8081/webhook
+stripe listen --forward-to localhost:8081/webhook
 ```
 
-Where `localhost:8081/webhook` is the endpoint `payment service` HTTP server address.
+Where `localhost:8081/webhook` is the endpoint of the payment service's HTTP server.
 
-Test card: 4242424242424242
+For testing, use the Stripe test card: `4242424242424242`
 
+## Management UIs
 
-## RabbitMQ UI
+### RabbitMQ Management UI
 
-http://localhost:15672/#/
+Access the RabbitMQ management interface at:
+```
+http://localhost:15672/
+```
+Default credentials: guest/guest
 
-## Jaeger UI
+### Jaeger UI
 
+Access the Jaeger UI for distributed tracing at:
+```
+http://localhost:16686/
+```
+
+### MongoDB Express
+
+Access the MongoDB web interface at:
+```
+http://localhost:8082/
+```
 
 ## Deployment
 
-Build Docker images for each microservice and push them to a container registry.
-Deploy using Docker Compose or orchestration tools like Kubernetes.
+For production deployment:
+
+1. Build Docker images for each microservice
+2. Push the images to a container registry
+3. Deploy using Docker Compose or Kubernetes
+
+## Development Guidelines
+
+### Service Structure
+
+Each service follows a similar structure:
+- `main.go`: Service entry point
+- `service.go`: Core business logic
+- `gateway/`: Client code for communicating with other services
+- `*_consumer.go`: RabbitMQ consumers for event handling
+
+### Adding New Features
+
+1. Define the API contract in `common/api/oms.proto`
+2. Generate the gRPC code using `make proto` in the common directory
+3. Implement the service logic
+4. Update the gateway service to expose new endpoints if needed
+
+### Testing
+
+Each service should include unit tests for core business logic and integration tests for API endpoints.
+
+## License
+
+[MIT License](LICENSE)
