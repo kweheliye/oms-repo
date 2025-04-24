@@ -166,35 +166,8 @@ Access the MongoDB web interface at:
 http://localhost:8082/
 ```
 
-## Deployment
 
-For production deployment:
-
-1. Build Docker images for each microservice
-2. Push the images to a container registry
-3. Deploy using Docker Compose or Kubernetes
-
-## Development Guidelines
-
-### Service Structure
-
-Each service follows a similar structure:
-- `main.go`: Service entry point
-- `service.go`: Core business logic
-- `gateway/`: Client code for communicating with other services
-- `*_consumer.go`: RabbitMQ consumers for event handling
-
-### Adding New Features
-
-1. Define the API contract in `common/api/oms.proto`
-2. Generate the gRPC code using `make proto` in the common directory
-3. Implement the service logic
-4. Update the gateway service to expose new endpoints if needed
-
-### Testing
+### Pending
 
 Each service should include unit tests for core business logic and integration tests for API endpoints.
 
-## License
-
-[MIT License](LICENSE)
